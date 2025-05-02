@@ -1,0 +1,29 @@
+/* Importing Tailwind CSS */
+@import "tailwindcss";
+
+/* Define colors for light theme (always light) */
+:root {
+  --background: #ffffff;  /* Light theme background */
+  --foreground: #171717;  /* Light theme foreground (text) */
+}
+
+/* Apply theme to Tailwind */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Always light theme */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Tailwind custom styles for always light theme */
+html {
+  background-color: var(--background);
+  color: var(--foreground);
+}
