@@ -1,30 +1,36 @@
-"use client";
-import React from "react";
-import Link from "next/link";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { useAuth } from "../hooks/useAuth";
-import ProfileMenu from "./ProfileMenu";
+'use client';
+import React from 'react';
+import Link from 'next/link';
+import { AppBar, Toolbar, Typography, Button, Avatar, Box } from '@mui/material';
+import { useAuth } from '@/contexts/AuthContext';
+import ProfileMenu from './ProfileMenu'; // adjust path if needed
+
 
 export default function Navbar() {
   const { user, logout } = useAuth();
 
+  const getInitial = (name) => {
+    return name?.charAt(0).toUpperCase() || 'U';
+  };
+
   return (
     <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography
+          variant="h6"
+          component={Link}
+          href="/"
+          sx={{ color: 'inherit', textDecoration: 'none' }}
+        >
           Gradesum
         </Typography>
 
-        <Button color="inherit" component={Link} href="/calculator">
-          Calculator
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button color="inherit" component={Link} href="/calculator">
+            Calculator
+          </Button>
 
-        {user ? (
-          <ProfileMenu user={user} onLogout={logout} />
-        ) : (
+        {!user ? (
           <>
             <Button color="inherit" component={Link} href="/auth/login">
               Login
@@ -33,7 +39,11 @@ export default function Navbar() {
               Sign Up
             </Button>
           </>
+        ) : (
+          <ProfileMenu user={user} onLogout={logout} />
         )}
+
+        </Box>
       </Toolbar>
     </AppBar>
   );
