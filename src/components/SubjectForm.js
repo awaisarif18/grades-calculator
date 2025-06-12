@@ -13,6 +13,7 @@ const SubjectForm = ({
     <div className="mb-4">
       <TextField
         label="Subject Name"
+        sx={{mt: 1}}
         variant="outlined"
         value={subjectName}
         onChange={(e) => setSubjectName(e.target.value)}
@@ -21,6 +22,7 @@ const SubjectForm = ({
       />
       <TextField
         label="Credit Hours"
+        sx={{mt: 1}}
         type="number"
         variant="outlined"
         value={creditHours}
@@ -30,6 +32,7 @@ const SubjectForm = ({
       />
       <TextField
         label="GPA"
+        sx={{mt: 1}}
         type="number"
         step="0.01"
         variant="outlined"
@@ -38,7 +41,22 @@ const SubjectForm = ({
         fullWidth
         className="mb-2"
       />
-      <Button variant="contained" onClick={addSubject} color="primary">
+      <Button variant="contained"             
+      sx={{   background: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              px: 2,
+              py: 1,
+              mt: 1,
+              transition: '0.3s ease',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.4)',
+                color: '#1d2b64',
+              },
+            }}
+            onClick={addSubject}
+            color="primary">
         Add Subject
       </Button>
     </div>

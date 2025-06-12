@@ -12,9 +12,10 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
 
 export default function HomePage() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -30,109 +31,117 @@ export default function HomePage() {
   if (loading) return null;
 
   return (
-    <Box textAlign="center" py={8} px={2}>
-      <Typography variant="h2" gutterBottom>
-        Welcome to Gradesum
-      </Typography>
-
-      {user ? (
-        <>
-          <Typography variant="h6" mb={2}>
-            Hello, {user.displayName || user.email} 👋
-          </Typography>
-          <Typography variant="h6" color="textSecondary" mb={4}>
-            Track your semesters CGPA, save your GPA history, and plan for your target CGPA.
-          </Typography>
-          <Typography variant="h6" color="textSecondary" mb={4}>
-            Click the button below to start. 👇
-          </Typography>
-
-        </>
-      ) : (
-        <Typography variant="h6" color="textSecondary" mb={4}>
-          Track your semesters, save your GPA history, and plan for your target CGPA.
-        </Typography>
-      )}
-
-      <Button
-        component={Link}
-        href="/calculator"
-        variant="contained"
-        size="large"
-        sx={{ mt: 2 }}
-      >
-        Calculate Your CGPA Now
-      </Button>
-
-      {/* LOGIN/SIGNUP MODAL */}
-      <Modal
-  open={showModal}
-  onClose={() => setShowModal(false)}
-  aria-labelledby="login-modal-title"
-  aria-describedby="login-modal-description"
->
-  <Box
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    minHeight="100vh"
-    px={2}
-  >
-    <Paper
-      elevation={4}
+    <Box
       sx={{
-        p: 4,
-        borderRadius: 3,
-        width: isMobile ? "100%" : 400,
-        textAlign: "center",
-        position: "relative", // for absolute close button
+        minHeight: "100vh",
+        background: "linear-gradient(to right, #1d2b64, #f8cdda)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        px: 2,
       }}
     >
-      {/* ❌ Close Button */}
-      <Button
-        onClick={() => setShowModal(false)}
-        sx={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          minWidth: "unset",
-          padding: "4px 8px",
-          fontSize: "1.2rem",
-          color: "gray",
-          lineHeight: 1,
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          maxWidth: "700px",
+          textAlign: "center",
+          color: "#fff",
         }}
       >
-        &times;
-      </Button>
+        <Typography variant="h2" gutterBottom>
+          Welcome to Gradesum
+        </Typography>
 
-      <Typography variant="h6" id="login-modal-title" gutterBottom>
-        You're not logged in!
-      </Typography>
-      <Typography variant="body2" color="textSecondary" mb={3}>
-        Please log in or sign up to save your CGPA history and progress.
-      </Typography>
-      <Stack direction="row" spacing={2} justifyContent="center">
+        {user ? (
+          <>
+            <Typography variant="h6" mb={2}>
+              Hello, {user.displayName || user.email} 👋
+            </Typography>
+            <Typography variant="h6" mb={4}>
+              Track your semesters CGPA, save your GPA history, and plan for your target CGPA.
+            </Typography>
+
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+
+              <Button
+                component={Link}
+                href="/history"
+                variant="outlined"
+                size="large"
+                sx={{
+                  color: "#fff",
+                  borderColor: "#fff",
+                  '&:hover': {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    borderColor: "#fff",
+                  },
+                }}
+              >
+                View History
+              </Button>
+            </Stack>
+          </>
+        ) : (
+          <Typography variant="h6" mb={4}>
+            Track your semesters, save your GPA history, and plan for your target CGPA.
+          </Typography>
+        )}
+
         <Button
+          component={Link}
+          href="/calculator"
           variant="contained"
-          component={Link}
-          href="/auth/login"
-          fullWidth
+          size="large"
+          sx={{ mt: 2 }}
         >
-          Login
+          Calculate Your CGPA Now
         </Button>
-        <Button
-          variant="outlined"
-          component={Link}
-          href="/auth/signup"
-          fullWidth
-        >
-          Signup
-        </Button>
-      </Stack>
-    </Paper>
-  </Box>
-</Modal>
+      </motion.div>
 
+      {/* Modal if not logged in */}
+      <Modal open={showModal} onClose={() => setShowModal(false)}>
+        <Box display="flex" alignItems="center" justifyContent="center" minHeight="100vh" px={2}>
+          <Paper elevation={4} sx={{ p: 4, borderRadius: 3, width: isMobile ? "100%" : 400,     position: "relative", }}>
+            <Button
+              onClick={() => setShowModal(false)}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                minWidth: "unset",
+                padding: "4px 8px",
+                fontSize: "1.2rem",
+                color: "gray",
+              }}
+            >
+              &times;
+            </Button>
+
+            <Typography variant="h6" gutterBottom>
+              You're not logged in!
+            </Typography>
+            <Typography variant="body2" color="textSecondary" mb={3}>
+              Please log in or sign up to save your CGPA history and progress.
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Button variant="contained" component={Link} href="/auth/login" fullWidth>
+                Login
+              </Button>
+              <Button variant="outlined" component={Link} href="/auth/signup" fullWidth>
+                Signup
+              </Button>
+            </Stack>
+          </Paper>
+        </Box>
+      </Modal>
     </Box>
   );
 }

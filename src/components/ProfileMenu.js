@@ -1,46 +1,63 @@
 "use client";
 import React, { useState } from "react";
 import {
-  Avatar,
-  IconButton,
   Menu,
   MenuItem,
-  ListItemIcon,
+  IconButton,
+  Avatar,
   Typography,
+  Box,
+  Divider,
 } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function ProfileMenu({ user, onLogout }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+
   const handleOpen = (e) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const handleLogout = () => {
+    onLogout();
+    handleClose();
+  };
 
   return (
     <>
-      <IconButton onClick={handleOpen} size="small" sx={{ ml: 2 }}>
-        <Avatar>{user.name?.charAt(0).toUpperCase()}</Avatar>
+      <IconButton onClick={handleOpen}>
+        <Avatar sx={{ bgcolor: "#673ab7" }}>
+          {(user.displayName || user.email)?.charAt(0).toUpperCase()}
+        </Avatar>
       </IconButton>
+
       <Menu
         anchorEl={anchorEl}
-        open={open}
+        open={Boolean(anchorEl)}
         onClose={handleClose}
-        disableScrollLock
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <MenuItem>
-          <Typography variant="body1">{user.name}</Typography>
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            onLogout();
-            handleClose();
-          }}
-        >
-          <ListItemIcon>
-            <LogoutIcon fontSize="small" />
-          </ListItemIcon>
-          Logout
-        </MenuItem>
+        <Box sx={{ px: 2, py: 1, textAlign: "center" }}>
+          <Avatar
+            sx={{
+              bgcolor: "#673ab7",
+              width: 56,
+              height: 56,
+              margin: "0 auto",
+              mb: 1,
+            }}
+          >
+            {(user.displayName || user.email)?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography variant="subtitle1">
+            {user.displayName || "No Name"}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {user.email}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </>
   );

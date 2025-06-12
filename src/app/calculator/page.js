@@ -1,31 +1,30 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import SubjectForm from "../../components/SubjectForm";
-import SubjectList from "../../components/SubjectList";
-import GPAResult from "../../components/GPAResult";
-import GoalForm from "../../components/GoalForm";
-import { Button } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-// Firebase imports
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { useAuth } from "@/contexts/AuthContext";
+'use client';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import SubjectForm from '../../components/SubjectForm';
+import SubjectList from '../../components/SubjectList';
+import GPAResult from '../../components/GPAResult';
+import GoalForm from '../../components/GoalForm';
+import { Button } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '@/contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 export default function CalculatorPage() {
   const { user } = useAuth();
 
   const [subjects, setSubjects] = useState([]);
-  const [subjectName, setSubjectName] = useState("");
-  const [creditHours, setCreditHours] = useState("");
-  const [gpa, setGpa] = useState("");
-  const [goalCGPA, setGoalCGPA] = useState("");
+  const [subjectName, setSubjectName] = useState('');
+  const [creditHours, setCreditHours] = useState('');
+  const [gpa, setGpa] = useState('');
+  const [goalCGPA, setGoalCGPA] = useState('');
   const [remainingSubjects, setRemainingSubjects] = useState([]);
   const [requiredGPA, setRequiredGPA] = useState([]);
-  const [remainingSubjectName, setRemainingSubjectName] = useState("");
-  const [remainingCreditHours, setRemainingCreditHours] = useState("");
+  const [remainingSubjectName, setRemainingSubjectName] = useState('');
+  const [remainingCreditHours, setRemainingCreditHours] = useState('');
 
   const addSubject = () => {
     if (subjectName && creditHours && gpa) {
@@ -35,9 +34,9 @@ export default function CalculatorPage() {
         gpa: parseFloat(gpa),
       };
       setSubjects([...subjects, newSubject]);
-      setSubjectName("");
-      setCreditHours("");
-      setGpa("");
+      setSubjectName('');
+      setCreditHours('');
+      setGpa('');
     }
   };
 
@@ -48,8 +47,8 @@ export default function CalculatorPage() {
         creditHours: parseFloat(remainingCreditHours),
       };
       setRemainingSubjects([...remainingSubjects, newRemainingSubject]);
-      setRemainingSubjectName("");
-      setRemainingCreditHours("");
+      setRemainingSubjectName('');
+      setRemainingCreditHours('');
     }
   };
 
@@ -109,18 +108,10 @@ export default function CalculatorPage() {
   };
 
   const saveCalculation = async () => {
-    if (!user) return alert("Login kar bhai pehle!");
+    if (!user) return alert('Login kar bhai pehle!');
 
     try {
-            console.log({
-  userId: user.uid,
-  subjects,
-  remainingSubjects,
-  goalCGPA,
-  calculatedCGPA: calculateCGPA(),
-  requiredGPAList: requiredGPA,
-});
-      await addDoc(collection(db, "calculations"), {
+      await addDoc(collection(db, 'calculations'), {
         userId: user.uid,
         subjects,
         remainingSubjects,
@@ -129,96 +120,140 @@ export default function CalculatorPage() {
         requiredGPAList: requiredGPA,
         timestamp: serverTimestamp(),
       });
-      alert("Calculation saved successfully ✅");
+      alert('Calculation saved successfully ✅');
     } catch (err) {
-      console.error("Save error:", err);
-      alert("Kuch garbar hogayi saving mein 💀");
+      console.error('Save error:', err);
+      alert('Kuch garbar hogayi saving mein 💀');
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Grades and CGPA Calculator</h1>
-
-      <SubjectForm
-        subjectName={subjectName}
-        setSubjectName={setSubjectName}
-        creditHours={creditHours}
-        setCreditHours={setCreditHours}
-        gpa={gpa}
-        setGpa={setGpa}
-        addSubject={addSubject}
-      />
-
-      <SubjectList
-        subjects={subjects}
-        deleteSubject={deleteSubject}
-        editSubject={editSubject}
-      />
-
-      <GoalForm goalCGPA={goalCGPA} setGoalCGPA={setGoalCGPA} />
-
-      <GPAResult
-        calculateCGPA={calculateCGPA}
-        requiredGPA={requiredGPA}
-        requiredGPAList={requiredGPA}
-      />
-
-      {/* Remaining Subject Form */}
-      <div className="mb-4">
-        <h2 className="font-semibold">Remaining Subjects</h2>
-        <input
-          type="text"
-          placeholder="Remaining Subject Name"
-          value={remainingSubjectName}
-          onChange={(e) => setRemainingSubjectName(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <input
-          type="number"
-          placeholder="Remaining Credit Hours"
-          value={remainingCreditHours}
-          onChange={(e) => setRemainingCreditHours(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <Button variant="contained" onClick={addRemainingSubject} color="secondary">
-          Add Remaining Subject
-        </Button>
-      </div>
-
-      <div className="mb-4">
-        <h2 className="font-semibold">Remaining Subjects:</h2>
-        <ul>
-          {remainingSubjects.map((subject, index) => (
-            <li key={index} className="flex items-center justify-between mb-2">
-              <span>
-                {subject.name} - {subject.creditHours} Credit Hours
-              </span>
-              <div className="flex">
-                <Button onClick={() => editRemainingSubject(index)} color="primary" size="small">
-                  <EditIcon />
-                </Button>
-                <Button onClick={() => deleteRemainingSubject(index)} color="secondary" size="small">
-                  <DeleteIcon />
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <Button variant="contained" onClick={calculateRequiredGPA} color="primary">
-        Calculate Required GPA
-      </Button>
-
-      <Button
-        variant="outlined"
-        color="success"
-        onClick={saveCalculation}
-        sx={{ mt: 2, ml: 2 }}
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #1d2b64, #f8cdda)' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto p-4"
       >
-        Save This Calculation
-      </Button>
+        <h1 className="text-2xl font-bold mb-4 text-white">Grades and CGPA Calculator</h1>
+
+        <SubjectForm
+          subjectName={subjectName}
+          setSubjectName={setSubjectName}
+          creditHours={creditHours}
+          setCreditHours={setCreditHours}
+          gpa={gpa}
+          setGpa={setGpa}
+          addSubject={addSubject}
+        />
+
+        <SubjectList subjects={subjects} deleteSubject={deleteSubject} editSubject={editSubject} />
+
+        <GoalForm goalCGPA={goalCGPA} setGoalCGPA={setGoalCGPA} />
+
+        <GPAResult calculateCGPA={calculateCGPA} requiredGPA={requiredGPA} requiredGPAList={requiredGPA} />
+
+        {/* Remaining Subject Form */}
+        <div className="mb-4">
+          <h2 className="font-semibold text-white">Remaining Subjects</h2>
+          <input
+            type="text"
+            placeholder="Remaining Subject Name"
+            value={remainingSubjectName}
+            onChange={(e) => setRemainingSubjectName(e.target.value)}
+            className="border p-2 mr-2"
+          />
+          <input
+            type="number"
+            placeholder="Remaining Credit Hours"
+            value={remainingCreditHours}
+            onChange={(e) => setRemainingCreditHours(e.target.value)}
+            className="border p-2 mr-2"
+          />
+          <Button
+            onClick={addRemainingSubject}
+            sx={{
+              background: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              px: 2,
+              py: 1,
+              mt: -0.5,
+              transition: '0.3s ease',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.4)',
+                color: '#1d2b64',
+              },
+            }}
+          >
+            Add Remaining Subject
+          </Button>
+        </div>
+
+        <div className="mb-4 text-white">
+          <h2 className="font-semibold">Remaining Subjects:</h2>
+          <ul>
+            {remainingSubjects.map((subject, index) => (
+              <li key={index} className="flex items-center justify-between mb-2">
+                <span>
+                  {subject.name} - {subject.creditHours} Credit Hours
+                </span>
+                <div className="flex">
+                  <Button onClick={() => editRemainingSubject(index)} color="primary" size="small">
+                    <EditIcon />
+                  </Button>
+                  <Button onClick={() => deleteRemainingSubject(index)} color="secondary" size="small">
+                    <DeleteIcon />
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex flex-wrap gap-4">
+          <Button
+            onClick={calculateRequiredGPA}
+            sx={{
+              background: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              px: 3,
+              py: 1.2,
+              fontWeight: 'bold',
+              transition: '0.3s ease',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.4)',
+                color: '#1d2b64',
+              },
+            }}
+          >
+            Calculate Required GPA
+          </Button>
+
+          <Button
+            onClick={saveCalculation}
+            sx={{
+              background: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              px: 3,
+              py: 1.2,
+              fontWeight: 'bold',
+              transition: '0.3s ease',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.4)',
+                color: '#1d2b64',
+              },
+            }}
+          >
+            Save This Calculation
+          </Button>
+        </div>
+      </motion.div>
     </div>
   );
 }
