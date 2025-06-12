@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: "90vh",
         background: "linear-gradient(to right, #1d2b64, #f8cdda)",
         display: "flex",
         justifyContent: "center",

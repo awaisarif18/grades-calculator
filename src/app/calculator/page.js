@@ -1,15 +1,14 @@
 'use client';
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import SubjectForm from '../../components/SubjectForm';
 import SubjectList from '../../components/SubjectList';
 import GPAResult from '../../components/GPAResult';
 import GoalForm from '../../components/GoalForm';
-import { Button } from '@mui/material';
+import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -25,6 +24,38 @@ export default function CalculatorPage() {
   const [requiredGPA, setRequiredGPA] = useState([]);
   const [remainingSubjectName, setRemainingSubjectName] = useState('');
   const [remainingCreditHours, setRemainingCreditHours] = useState('');
+  const [savedCalculations, setSavedCalculations] = useState([]);
+  const [selectedCalcId, setSelectedCalcId] = useState('');
+
+  useEffect(() => {
+    const fetchSaved = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'calculations'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setSavedCalculations(data);
+      } catch (err) {
+        console.error('🔥 Error fetching calculations:', err);
+      }
+    };
+
+    if (user) fetchSaved();
+  }, [user]);
+
+  const loadCalculation = (calcId) => {
+    const selected = savedCalculations.find(calc => calc.id === calcId);
+    if (!selected) return;
+    setSubjects(selected.subjects || []);
+    setRemainingSubjects(selected.remainingSubjects || []);
+    setGoalCGPA(selected.goalCGPA?.toString() || '');
+    setRequiredGPA(selected.requiredGPAList || []);
+    setSelectedCalcId(calcId);
+  };
 
   const addSubject = () => {
     if (subjectName && creditHours && gpa) {
@@ -53,13 +84,11 @@ export default function CalculatorPage() {
   };
 
   const deleteSubject = (index) => {
-    const newSubjects = subjects.filter((_, i) => i !== index);
-    setSubjects(newSubjects);
+    setSubjects(subjects.filter((_, i) => i !== index));
   };
 
   const deleteRemainingSubject = (index) => {
-    const newRemainingSubjects = remainingSubjects.filter((_, i) => i !== index);
-    setRemainingSubjects(newRemainingSubjects);
+    setRemainingSubjects(remainingSubjects.filter((_, i) => i !== index));
   };
 
   const editSubject = (index) => {
@@ -137,6 +166,23 @@ export default function CalculatorPage() {
       >
         <h1 className="text-2xl font-bold mb-4 text-white">Grades and CGPA Calculator</h1>
 
+        {savedCalculations.length > 0 && (
+          <FormControl fullWidth className="mb-4 bg-white rounded-md">
+            <InputLabel>Select a saved calculation</InputLabel>
+            <Select
+              value={selectedCalcId}
+              label="Select a saved calculation"
+              onChange={(e) => loadCalculation(e.target.value)}
+            >
+              {savedCalculations.map((calc, i) => (
+                <MenuItem key={calc.id} value={calc.id}>
+                  Calculation #{i + 1} — Goal CGPA: {calc.goalCGPA?.toFixed(2) ?? '--'}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
         <SubjectForm
           subjectName={subjectName}
           setSubjectName={setSubjectName}
@@ -153,9 +199,8 @@ export default function CalculatorPage() {
 
         <GPAResult calculateCGPA={calculateCGPA} requiredGPA={requiredGPA} requiredGPAList={requiredGPA} />
 
-        {/* Remaining Subject Form */}
-        <div className="mb-4">
-          <h2 className="font-semibold text-white">Remaining Subjects</h2>
+        <div className="mb-4 text-white">
+          <h2 className="font-semibold">Remaining Subjects</h2>
           <input
             type="text"
             placeholder="Remaining Subject Name"

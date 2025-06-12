@@ -6,6 +6,8 @@ import {
   where,
   getDocs,
   orderBy,
+  deleteDoc,
+  doc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,12 +24,9 @@ export default function SavedCalculationsPage() {
       if (!user) return;
 
       try {
-        console.log('Fetching for UID:', user.uid);
-
         let q;
 
         try {
-          // Try fetching with timestamp
           q = query(
             collection(db, 'calculations'),
             where('userId', '==', user.uid),
@@ -42,14 +41,11 @@ export default function SavedCalculationsPage() {
         }
 
         const snapshot = await getDocs(q);
-        console.log('Fetched docs:', snapshot.docs.length);
-
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        console.log('Parsed data:', data);
         setCalculations(data);
       } catch (err) {
         console.error('🔥 Error fetching history:', err);
@@ -63,9 +59,21 @@ export default function SavedCalculationsPage() {
     }
   }, [user, loading]);
 
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'calculations', id));
+      setCalculations(prev => prev.filter(calc => calc.id !== id));
+    } catch (err) {
+      console.error('❌ Error deleting calculation:', err);
+    }
+  };
+
   if (loading || fetching) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-white" style={{ background: 'linear-gradient(to right, #1d2b64, #f8cdda)' }}>
+      <div
+        className="min-h-screen flex justify-center items-center text-white"
+        style={{ background: 'linear-gradient(to right, #1d2b64, #f8cdda)' }}
+      >
         Loading your saved data...
       </div>
     );
@@ -90,27 +98,21 @@ export default function SavedCalculationsPage() {
           <div className="grid gap-4">
             {calculations.map((calc, index) => (
               <div
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    borderRadius: 2,
-                    '& fieldset': {
-                      borderColor: 'rgba(255,255,255,0.5)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: '#fff',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#fff',
-                    },
-                  },
-                }}
                 key={calc.id}
-                className="bg-opacity-10 backdrop-blur-md p-4 rounded-md shadow-md border border-white/20"
+                className=" backdrop-blur-md p-4 rounded-md shadow-md border border-white/20"
               >
-                <h2 className="text-lg font-semibold">
-                  Calculation #{index + 1}
-                </h2>
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-lg font-semibold">
+                    Calculation #{index + 1}
+                  </h2>
+                  <button
+                    onClick={() => handleDelete(calc.id)}
+                    className="text-sm text-red-300 hover:text-red-500 border border-red-300 hover:border-red-500 px-2 py-1 rounded transition-all duration-150"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+
                 <p>
                   <strong>Goal CGPA:</strong>{' '}
                   {calc.goalCGPA?.toFixed(2) ?? '--'}
