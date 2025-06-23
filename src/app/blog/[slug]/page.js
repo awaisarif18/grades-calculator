@@ -1,9 +1,13 @@
+// src/app/blog/[slug]/page.js
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { serialize } from "next-mdx-remote/serialize";
 import Link from "next/link";
-import ClientPost from "./ClientPost";
+import dynamic from "next/dynamic";
+
+// Dynamically import the client component to avoid SSR issues with MDXRemote
+const ClientPost = dynamic(() => import("./ClientPost"), { ssr: false });
 
 export async function generateStaticParams() {
   const postsDir = path.join(process.cwd(), "posts");
@@ -27,6 +31,7 @@ export default async function PostPage({ params }) {
         </h1>
         <p className="text-gray-500 mb-8">{data.date}</p>
 
+        {/* Client-only rendering of MDX content */}
         <ClientPost mdxSource={mdxSource} />
 
         <div className="mt-8">
