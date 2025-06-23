@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MDXRemote } from "next-mdx-remote";
+import { MDXRemote } from "next-mdx-remote-client/rsc";
 
 export default function ClientPost({ mdxSource }) {
   return (

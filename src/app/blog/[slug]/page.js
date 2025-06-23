@@ -3,7 +3,8 @@ import path from "path";
 import matter from "gray-matter";
 import { serialize } from "next-mdx-remote/serialize";
 import Link from "next/link";
-import ClientPost from "./ClientPost"; // Regular import of client component
+import ClientPost from "./ClientPost";
+ // Regular import of client component
 
 export async function generateStaticParams() {
   const postsDir = path.join(process.cwd(), "posts");
