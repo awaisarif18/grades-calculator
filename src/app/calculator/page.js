@@ -1,9 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import SubjectForm from '../../components/SubjectForm';
-import SubjectList from '../../components/SubjectList';
-import GPAResult from '../../components/GPAResult';
 import GoalForm from '../../components/GoalForm';
+import GPAResult from '../../components/GPAResult';
 import { Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -167,7 +166,7 @@ export default function CalculatorPage() {
         <h1 className="text-2xl font-bold mb-4 text-white">Grades and CGPA Calculator</h1>
 
         {savedCalculations.length > 0 && (
-          <FormControl fullWidth className="mb-4 bg-white rounded-md">
+          <FormControl fullWidth className="mb-4 rounded-md">
             <InputLabel>Select a saved calculation</InputLabel>
             <Select
               value={selectedCalcId}
@@ -193,7 +192,36 @@ export default function CalculatorPage() {
           addSubject={addSubject}
         />
 
-        <SubjectList subjects={subjects} deleteSubject={deleteSubject} editSubject={editSubject} />
+        {subjects.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-white mb-2">Added Subjects</h2>
+            <div className="overflow-x-auto rounded-lg shadow-md">
+              <table className="w-full bg-linear-gradient(to right, #1d2b64, #f8cdda) bg-opacity-90 text-sm text-left">
+                <thead className="text-gray-700 uppercase text-xs">
+                  <tr>
+                    <th className="px-4 py-3">Subject</th>
+                    <th className="px-4 py-3">Credit Hours</th>
+                    <th className="px-4 py-3">GPA</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subjects.map((subject, index) => (
+                    <tr key={index} className="bg-linear-gradient(to right, #1d2b64, #f8cdda)  hover:bg-white/10">
+                      <td className="px-4 py-2">{subject.name}</td>
+                      <td className="px-4 py-2">{subject.creditHours}</td>
+                      <td className="px-4 py-2">{subject.gpa}</td>
+                      <td className="px-4 py-2">
+                        <Button onClick={() => editSubject(index)} size="small"><EditIcon /></Button>
+                        <Button onClick={() => deleteSubject(index)} size="small" color="secondary"><DeleteIcon /></Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         <GoalForm goalCGPA={goalCGPA} setGoalCGPA={setGoalCGPA} />
 
@@ -215,88 +243,41 @@ export default function CalculatorPage() {
             onChange={(e) => setRemainingCreditHours(e.target.value)}
             className="border p-2 mr-2"
           />
-          <Button
-            onClick={addRemainingSubject}
-            sx={{
-              background: 'rgba(255,255,255,0.2)',
-              color: '#fff',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              px: 2,
-              py: 1,
-              mt: -0.5,
-              transition: '0.3s ease',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.4)',
-                color: '#1d2b64',
-              },
-            }}
-          >
-            Add Remaining Subject
-          </Button>
+          <Button onClick={addRemainingSubject} variant="outlined" color="inherit">Add Remaining Subject</Button>
         </div>
 
-        <div className="mb-4 text-white">
-          <h2 className="font-semibold">Remaining Subjects:</h2>
-          <ul>
-            {remainingSubjects.map((subject, index) => (
-              <li key={index} className="flex items-center justify-between mb-2">
-                <span>
-                  {subject.name} - {subject.creditHours} Credit Hours
-                </span>
-                <div className="flex">
-                  <Button onClick={() => editRemainingSubject(index)} color="primary" size="small">
-                    <EditIcon />
-                  </Button>
-                  <Button onClick={() => deleteRemainingSubject(index)} color="secondary" size="small">
-                    <DeleteIcon />
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {remainingSubjects.length > 0 && (
+          <div className="mb-6 text-white">
+            <h2 className="font-semibold">Remaining Subjects</h2>
+            <div className="overflow-x-auto rounded-lg shadow-md">
+              <table className="w-full  bg-opacity-90 text-sm text-left rounded-xl">
+                <thead className="text-gray-700 uppercase bg-linear-gradient(to right, #1d2b64, #f8cdda) text-xs">
+                  <tr>
+                    <th className="px-4 py-3">Subject</th>
+                    <th className="px-4 py-3">Credit Hours</th>
+                    <th className="px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {remainingSubjects.map((subject, index) => (
+                    <tr key={index} className="bg-linear-gradient(to right, #1d2b64, #f8cdda) border-collapse hover:bg-white/10 text-black">
+                      <td className="px-4 py-2">{subject.name}</td>
+                      <td className="px-4 py-2">{subject.creditHours}</td>
+                      <td className="px-4 py-2">
+                        <Button onClick={() => editRemainingSubject(index)} size="small"><EditIcon /></Button>
+                        <Button onClick={() => deleteRemainingSubject(index)} size="small" color="secondary"><DeleteIcon /></Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-4">
-          <Button
-            onClick={calculateRequiredGPA}
-            sx={{
-              background: 'rgba(255,255,255,0.2)',
-              color: '#fff',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              px: 3,
-              py: 1.2,
-              fontWeight: 'bold',
-              transition: '0.3s ease',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.4)',
-                color: '#1d2b64',
-              },
-            }}
-          >
-            Calculate Required GPA
-          </Button>
-
-          <Button
-            onClick={saveCalculation}
-            sx={{
-              background: 'rgba(255,255,255,0.2)',
-              color: '#fff',
-              backdropFilter: 'blur(8px)',
-              borderRadius: 2,
-              px: 3,
-              py: 1.2,
-              fontWeight: 'bold',
-              transition: '0.3s ease',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.4)',
-                color: '#1d2b64',
-              },
-            }}
-          >
-            Save This Calculation
-          </Button>
+          <Button onClick={calculateRequiredGPA} variant="contained" color="primary">Calculate Required GPA</Button>
+          <Button onClick={saveCalculation} variant="contained" color="secondary">Save This Calculation</Button>
         </div>
       </motion.div>
     </div>

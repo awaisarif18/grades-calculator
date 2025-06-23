@@ -1,9 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Paper } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -11,17 +13,32 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [degree, setDegree] = useState('');
+  const [uni, setUni] = useState('');
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handle = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (password !== confirm) return setError("Passwords don't match!");
+
     try {
-      await signup(email, password, username);
+      const newUser = await signup(email, password, username);
+      const uid = newUser.user.uid;
+      const userEmail = newUser.user.email;
+
+      await setDoc(doc(db, 'profiles', uid), {
+        userId: uid,
+        email: userEmail,
+        fullName,
+        degree,
+        university: uni,
+      });
+
       router.push('/calculator');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Signup failed");
     }
   };
 
@@ -55,52 +72,46 @@ export default function SignupPage() {
           <Typography variant="h4" align="center" mb={2}>
             Sign Up
           </Typography>
-          <form onSubmit={handle}>
+
+          <form onSubmit={handleSignup}>
             {[
-              { label: 'Username', type: 'text', value: username, setValue: setUsername },
-              { label: 'Email', type: 'email', value: email, setValue: setEmail },
-              { label: 'Password', type: 'password', value: password, setValue: setPassword },
-              { label: 'Confirm Password', type: 'password', value: confirm, setValue: setConfirm },
-            ].map(({ label, type, value, setValue }, idx) => (
+              { label: 'Username', value: username, setValue: setUsername, type: 'text' },
+              { label: 'Email', value: email, setValue: setEmail, type: 'email' },
+              { label: 'Password', value: password, setValue: setPassword, type: 'password' },
+              { label: 'Confirm Password', value: confirm, setValue: setConfirm, type: 'password' },
+              { label: 'Full Name', value: fullName, setValue: setFullName, type: 'text' },
+              { label: 'Degree Program', value: degree, setValue: setDegree, type: 'text' },
+              { label: 'University', value: uni, setValue: setUni, type: 'text' },
+            ].map(({ label, value, setValue, type }, index) => (
               <TextField
-                key={idx}
+                key={index}
                 label={label}
+                value={value}
                 type={type}
                 required
                 fullWidth
-                value={value}
                 onChange={(e) => setValue(e.target.value)}
                 margin="normal"
-                InputProps={{
-                  style: { color: '#fff' },
-                }}
-                InputLabelProps={{
-                  style: {
-                    color: '#fff',
-                  },
-                }}
+                InputProps={{ style: { color: '#fff' } }}
+                InputLabelProps={{ style: { color: '#fff' } }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     background: 'rgba(255, 255, 255, 0.15)',
                     borderRadius: 2,
-                    '& fieldset': {
-                      borderColor: 'rgba(255,255,255,0.5)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: '#fff',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#fff',
-                    },
+                    '& fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+                    '&:hover fieldset': { borderColor: '#fff' },
+                    '&.Mui-focused fieldset': { borderColor: '#fff' },
                   },
                 }}
               />
             ))}
+
             {error && (
               <Typography color="error" sx={{ mt: 1 }}>
                 {error}
               </Typography>
             )}
+
             <Button
               type="submit"
               fullWidth
@@ -112,7 +123,6 @@ export default function SignupPage() {
                 color: '#fff',
                 fontWeight: 'bold',
                 backdropFilter: 'blur(10px)',
-                transition: '0.3s ease',
                 '&:hover': {
                   background: 'rgba(255, 255, 255, 0.4)',
                   color: '#1d2b64',

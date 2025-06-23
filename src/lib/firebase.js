@@ -1,6 +1,7 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage"; // ✅ Add this
 
 const firebaseConfig = {
   apiKey: "AIzaSyADRaQ4v1paMacXkBPayIgO5Jv3HhpkeIU",
@@ -13,7 +14,9 @@ const firebaseConfig = {
   measurementId: "G-2ZSKZ093FJ"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];const auth = getAuth(app);
-const db = getFirestore(app); // 🔥 Add Firestore instance
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app); // ✅ Initialize storage
 
-export { app, auth, db }; // 👈 Export Firestore
+export { app, auth, db, storage }; // ✅ Export it

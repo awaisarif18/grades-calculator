@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
+import FeedbackForm from "@/components/FeedBackForm";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -33,12 +34,13 @@ export default function HomePage() {
   return (
     <Box
       sx={{
-        minHeight: "90vh",
+        minHeight: "93.3vh",
         background: "linear-gradient(to right, #1d2b64, #f8cdda)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         px: 2,
+        flexDirection: "column",
       }}
     >
       <motion.div
@@ -70,7 +72,6 @@ export default function HomePage() {
               justifyContent="center"
               alignItems="center"
             >
-
               <Button
                 component={Link}
                 href="/history"
@@ -109,7 +110,7 @@ export default function HomePage() {
       {/* Modal if not logged in */}
       <Modal open={showModal} onClose={() => setShowModal(false)}>
         <Box display="flex" alignItems="center" justifyContent="center" minHeight="100vh" px={2}>
-          <Paper elevation={4} sx={{ p: 4, borderRadius: 3, width: isMobile ? "100%" : 400,     position: "relative", }}>
+          <Paper elevation={4} sx={{ p: 4, borderRadius: 3, width: isMobile ? "100%" : 400, position: "relative" }}>
             <Button
               onClick={() => setShowModal(false)}
               sx={{
@@ -142,6 +143,10 @@ export default function HomePage() {
           </Paper>
         </Box>
       </Modal>
+
+      <Box mt={6} width="100%" maxWidth="700px">
+        <FeedbackForm />
+      </Box>
     </Box>
   );
 }

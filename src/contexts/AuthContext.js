@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCred.user, { displayName: username });
     setUser(userCred.user);
-    return userCred.user;
+    return userCred; // 🔥 fixed here
   };
 
   const login = async (email, password) => {
