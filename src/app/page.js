@@ -32,9 +32,10 @@ export default function HomePage() {
   if (loading) return null;
 
   return (
+    <div>
     <Box
       sx={{
-        minHeight: "93.3vh",
+        minHeight: "130vh",
         background: "linear-gradient(to right, #1d2b64, #f8cdda)",
         display: "flex",
         justifyContent: "center",
@@ -148,5 +149,6 @@ export default function HomePage() {
         <FeedbackForm />
       </Box>
     </Box>
+    </div>
   );
 }
