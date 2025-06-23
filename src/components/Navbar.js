@@ -14,7 +14,7 @@ export default function Navbar() {
 
   return (
     <AppBar position="static">
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between", background: "linear-gradient(to left,rgb(209, 138, 152),rgb(142, 156, 223))" }}>
         <Typography
           variant="h6"
           component={Link}
